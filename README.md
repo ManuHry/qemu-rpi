@@ -11,10 +11,11 @@
 > [!NOTE]
 > AlmaLinux 10 is not compatible with Raspberry Pi 3, as it support only MBR (not GPT)!
 >
-> Raspberry Pi OS 13 seems not to boot correctly by now.
+> AlmaLinux 8 seems not to boot correctly by now.
 
-- [Raspberry Pi OS 12 lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz)
-- [Raspberry Pi OS 11 lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-05-07/2025-05-06-raspios-bullseye-arm64-lite.img.xz)
+- [Raspberry Pi OS 13 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64-lite.img.xz)
+- [Raspberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz)
+- [Raspberry Pi OS 11 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-05-07/2025-05-06-raspios-bullseye-arm64-lite.img.xz)
 - [AlmaLinux 9 - no GUI](https://repo.almalinux.org/almalinux/9/raspberrypi/images/AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw.xz)
 - [AlmaLinux 8 - no GUI](https://repo.almalinux.org/almalinux/8/raspberrypi/images/AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw.xz)
 
@@ -30,12 +31,18 @@
 2. Mount image and go to '0*.fat' to retrieve following files:
    - kernel8.img (Linux kernel)
    - bcm****-rpi-*.dtb (Device tree, for Raspberry Pi 3 use bcm2710-rpi-3-b.dtb)
-3. For Raspberry Pi OS, add following files in /boot/ (same path as kernel and DTB)
-   - ssh (empty file)
-   - userconfig.txt with following
-        ```
-        pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0
-        ```
+   - initramfs8 (Debian 13) or initramfs-*.el9.img (AlmaLinux 9)
+3. Assure remote access
+   - For Raspberry Pi OS, add following files in same path as kernel and DTB
+     - ssh (empty file)
+     - userconfig.txt with following
+       ```
+       pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0
+       ```
+   - For AlmaLinux, in same path as kernel and DTB, edit user-data to allow SSH access with password:
+     ```YAML
+     ssh_pwauth: true
+     ```
 
 ## How to emulate Raspberry Pi 3
 
@@ -61,4 +68,13 @@ qemu-system-aarch64 -nographic -machine raspi3b -kernel deb12\kernel8.img -dtb d
 ### Raspberry Pi OS 11
 ```Shell
 qemu-system-aarch64 -nographic -machine raspi3b -kernel deb11\kernel8.img -dtb deb11\bcm2710-rpi-3-b.dtb -drive file=deb11\2025-05-06-raspios-bullseye-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "console=ttyAMA0,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+```
+
+### AlmaLinux 9
+
+> [!NOTE]
+> Since this version mounting initramfs is needed.
+
+```Shell
+qemu-system-aarch64 -nographic -machine raspi3b -kernel alma9\kernel-6.12.47-20250916.v8.1.el9.img -dtb alma9\bcm2710-rpi-3-b.dtb -drive file=alma9\AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0" -initrd alma9\initramfs-6.12.47-20250916.v8.1.el9.img
 ```
