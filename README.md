@@ -11,7 +11,7 @@
 > [!NOTE]
 > AlmaLinux 10 is not compatible with Raspberry Pi 3, as it support only MBR (not GPT)!
 >
-> AlmaLinux 8 seems not to boot correctly by now.
+> Raspberry Pi OS 13 and AlmaLinux 8 seems not to boot correctly by now.
 
 - [Raspberry Pi OS 13 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64-lite.img.xz)
 - [Raspberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz)
@@ -31,7 +31,7 @@
 2. Mount image and go to '0*.fat' to retrieve following files:
    - kernel8.img (Linux kernel)
    - bcm****-rpi-*.dtb (Device tree, for Raspberry Pi 3 use bcm2710-rpi-3-b.dtb)
-   - initramfs8 (Debian 13) or initramfs-*.el9.img (AlmaLinux 9)
+   - initramfs-*.el9.img just for AlmaLinux 9
 3. Assure remote access
    - For Raspberry Pi OS, add following files in same path as kernel and DTB
      - ssh (empty file)
