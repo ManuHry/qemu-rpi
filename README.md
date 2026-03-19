@@ -33,13 +33,13 @@
    - bcm****-rpi-*.dtb (Device tree, for Raspberry Pi 3 use bcm2710-rpi-3-b.dtb)
    - initramfs-*.el9.img just for AlmaLinux 9
 3. Assure remote access
-   - For Raspberry Pi OS, add following files in same path as kernel and DTB
-     - ssh (empty file)
-     - userconfig.txt with following
+   - For Raspberry Pi OS, to use pi/raspberry credentials, add following files in same path as kernel and DTB
+     - ssh (empty file to activate sshd service)
+     - userconfig.txt with following (encrypted password)
        ```
        pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0
        ```
-   - For AlmaLinux, in same path as kernel and DTB, edit user-data to allow SSH access with password:
+   - For AlmaLinux, to use almalinux/almalinux credentials, edit user-data in same path as kernel and DTB to allow SSH access with password:
      ```YAML
      ssh_pwauth: true
      ```
@@ -77,4 +77,10 @@ qemu-system-aarch64 -nographic -machine raspi3b -kernel deb11\kernel8.img -dtb d
 
 ```Shell
 qemu-system-aarch64 -nographic -machine raspi3b -kernel alma9\kernel-6.12.47-20250916.v8.1.el9.img -dtb alma9\bcm2710-rpi-3-b.dtb -drive file=alma9\AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0" -initrd alma9\initramfs-6.12.47-20250916.v8.1.el9.img
+```
+
+### AlmaLinux 8 (terribly slow, wait cloud-init to be complete)
+
+```Shell
+qemu-system-aarch64 -nographic -machine raspi3b -kernel alma8\kernel-6.6.74-20250127.v8.1.el8.img -dtb alma8\bcm2710-rpi-3-b.dtb -drive file=alma8\AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0
 ```
