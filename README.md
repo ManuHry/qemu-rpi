@@ -9,33 +9,33 @@
 ## Original images download links
 
 > [!NOTE]
-> AlmaLinux 10 is not compatible with Raspberry Pi 3, as it support only MBR (not GPT)!
+> AlmaLinux 10 is not compatible with Raspberry Pi 3, as it support only MBR (not GPT)! Raspberry Pi OS 13 and AlmaLinux 8 seems not to boot correctly by now.
 >
-> Raspberry Pi OS 13 and AlmaLinux 8 seems not to boot correctly by now.
+> Links do not point to *\*-**latest**.\** files, explore parent folder to check if any new version isavailable.
 
-- [Raspberry Pi OS 13 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64-lite.img.xz)
-- [Raspberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz)
-- [Raspberry Pi OS 11 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-05-07/2025-05-06-raspios-bullseye-arm64-lite.img.xz)
-- [AlmaLinux 9 - no GUI](https://repo.almalinux.org/almalinux/9/raspberrypi/images/AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw.xz)
-- [AlmaLinux 8 - no GUI](https://repo.almalinux.org/almalinux/8/raspberrypi/images/AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw.xz)
+- [Raspberry Pi OS 13 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64-lite.img.xz) (2.78 GB uncompressed)
+- [Raspberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz) (2.56 GB uncompressed)
+- [Raspberry Pi OS 11 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-05-07/2025-05-06-raspios-bullseye-arm64-lite.img.xz) (1.96 GB uncompressed)
+- [AlmaLinux 9 - no GUI](https://repo.almalinux.org/almalinux/9/raspberrypi/images/AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw.xz) (2,83 GB uncompressed - *yes, you read right*)
+- [AlmaLinux 8 - no GUI](https://repo.almalinux.org/almalinux/8/raspberrypi/images/AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw.xz) (3,41 GB uncompressed)
 
 ### Preparing images
 
 > [!WARNING]
 > It is highly recommended to change password as soon as possible!
 
-1. Resize *.img or *.raw file to at least 4 GB:
+1. Resize *\*.img* or *\*.raw* file to at least 4 GB:
    ```Shell
    qemu-img resize -f raw FILE_PATH 4G
    ```
-2. Mount image and go to '0*.fat' to retrieve following files:
-   - kernel8.img (Linux kernel)
-   - bcm****-rpi-*.dtb (Device tree, for Raspberry Pi 3 use bcm2710-rpi-3-b.dtb)
-   - initramfs-*.el9.img just for AlmaLinux 9
+2. Mount image and go to *0\*.fat* (first partition) to retrieve following files:
+   - ***kernel8**.img* (Linux kernel)
+   - ***bcm\*\*\*\*-rpi-\***.dtb* (Device tree, for Raspberry Pi 3 use bcm2710-rpi-3-b.dtb)
+   - ***initramfs-\*.el**\*.img* just for AlmaLinux 9+
 3. Assure remote access
    - For Raspberry Pi OS, to use pi/raspberry credentials, add following files in same path as kernel and DTB
-     - ssh (empty file to activate sshd service)
-     - userconfig.txt with following (encrypted password)
+     - ***ssh*** (empty file to activate sshd service)
+     - ***userconfig**.txt* with following (encrypted password)
        ```
        pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0
        ```
@@ -70,7 +70,7 @@ qemu-system-aarch64 -nographic -machine raspi3b -kernel deb12\kernel8.img -dtb d
 qemu-system-aarch64 -nographic -machine raspi3b -kernel deb11\kernel8.img -dtb deb11\bcm2710-rpi-3-b.dtb -drive file=deb11\2025-05-06-raspios-bullseye-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "console=ttyAMA0,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
-### AlmaLinux 9
+### AlmaLinux 9 *(slow, wait cloud-init to be complete)*
 
 > [!NOTE]
 > Since this version mounting initramfs is needed.
@@ -79,7 +79,7 @@ qemu-system-aarch64 -nographic -machine raspi3b -kernel deb11\kernel8.img -dtb d
 qemu-system-aarch64 -nographic -machine raspi3b -kernel alma9\kernel-6.12.47-20250916.v8.1.el9.img -dtb alma9\bcm2710-rpi-3-b.dtb -drive file=alma9\AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0" -initrd alma9\initramfs-6.12.47-20250916.v8.1.el9.img
 ```
 
-### AlmaLinux 8 (terribly slow, wait cloud-init to be complete)
+### AlmaLinux 8 *(terribly slow, wait cloud-init to be complete)*
 
 ```Shell
 qemu-system-aarch64 -nographic -machine raspi3b -kernel alma8\kernel-6.6.74-20250127.v8.1.el8.img -dtb alma8\bcm2710-rpi-3-b.dtb -drive file=alma8\AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0
