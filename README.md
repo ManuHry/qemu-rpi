@@ -1,4 +1,4 @@
-# Ready-to-use QEMU commands for Raspberry Pi 3 emulation
+# Ready-to-use Raspberry Pi QEMU commands
 
 ## Reference
 
@@ -6,18 +6,22 @@
 - [Running Raspberry Pi OS on QEMU x64: Emulating a Pi on Your Ubuntu PC :: Martin Koníček - Personal site](https://www.martinkonicek.eu/posts/rpi-qemu/)
 - [Emulating Raspberry Pi 4 with Qemu](https://gist.github.com/cGandom/23764ad5517c8ec1d7cd904b923ad863/)
 
+> [!NOTE]
+> Raspberry Pi 4 is not fully emulated in QEMU: it lacks PCI including USB devices!
+
 ## Original images download links
 
 > [!NOTE]
-> AlmaLinux 10 is not compatible with Raspberry Pi 3, as it support only MBR (not GPT)! Raspberry Pi OS 13 and AlmaLinux 8 seems not to boot correctly by now.
+> AlmaLinux 10 is not compatible with Raspberry Pi 3, as it support only MBR (not GPT)! Raspberry Pi OS 13 seems not to boot correctly by now.
 >
-> Links do not point to *\*-**latest**.\** files, explore parent folder to check if any new version isavailable.
+> Links do not point to *\*-**latest**.\** files, explore parent folder to check if any new version is available.
 
 - [Raspberry Pi OS 13 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64-lite.img.xz) (2.78 GB uncompressed)
 - [Raspberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz) (2.56 GB uncompressed)
 - [Raspberry Pi OS 11 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-05-07/2025-05-06-raspios-bullseye-arm64-lite.img.xz) (1.96 GB uncompressed)
-- [AlmaLinux 9 - no GUI](https://repo.almalinux.org/almalinux/9/raspberrypi/images/AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw.xz) (2,83 GB uncompressed - *yes, you read right*)
-- [AlmaLinux 8 - no GUI](https://repo.almalinux.org/almalinux/8/raspberrypi/images/AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw.xz) (3,41 GB uncompressed)
+- [AlmaLinux 10 - no GUI](https://repo.almalinux.org/almalinux/10/raspberrypi/images/AlmaLinux-10-RaspberryPi-gpt-10.1-20251201.aarch64.raw.xz) (2.83 GB uncompressed)
+- [AlmaLinux 9 - no GUI](https://repo.almalinux.org/almalinux/9/raspberrypi/images/AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw.xz) (2.83 GB uncompressed)
+- [AlmaLinux 8 - no GUI](https://repo.almalinux.org/almalinux/8/raspberrypi/images/AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw.xz) (3.41 GB uncompressed - *yes, you read right*)
 
 ### Preparing images
 
@@ -30,24 +34,21 @@
    ```
 2. Mount image and go to *0\*.fat* (first partition) to retrieve following files:
    - ***kernel8**.img* (Linux kernel)
-   - ***bcm\*\*\*\*-rpi-\***.dtb* (Device tree, for Raspberry Pi 3 use bcm2710-rpi-3-b.dtb)
    - ***initramfs-\*.el**\*.img* just for AlmaLinux 9+
+   - ***bcm\*\*\*\*-rpi-\***.dtb* (Device tree, prefer use of bcm2710-rpi-3-b.dtb for Raspberry Pi 3 as it has better compatibility)
 3. Assure remote access
-   - For Raspberry Pi OS, to use pi/raspberry credentials, add following files in same path as kernel and DTB
+   - For Raspberry Pi OS, to use `pi/raspberry` credentials, add following files in same path as kernel and DTB
      - ***ssh*** (empty file to activate sshd service)
      - ***userconfig**.txt* with following (encrypted password)
        ```
        pi:$6$c70VpvPsVNCG0YR5$l5vWWLsLko9Kj65gcQ8qvMkuOoRkEagI90qi3F/Y7rm8eNYZHW8CY6BOIKwMH7a3YYzZYL90zf304cAHLFaZE0
        ```
-   - For AlmaLinux, to use almalinux/almalinux credentials, edit user-data in same path as kernel and DTB to allow SSH access with password:
+   - For AlmaLinux, to use `almalinux/almalinux` credentials, edit user-data in same path as kernel and DTB to allow SSH access with password:
      ```YAML
      ssh_pwauth: true
      ```
 
-## How to emulate Raspberry Pi 3
-
-> [!NOTE]
-> Raspberry Pi 4 is not fully emulated in QEMU, and for example lacks PCI including USB devices!
+## How to emulate a Raspberry Pi
 
 Simply use following commands (adapt paths to your needs), then connect to localhost via SSH on port 2222:
 
@@ -57,17 +58,26 @@ Simply use following commands (adapt paths to your needs), then connect to local
 ### Raspberry Pi OS 12
 
 > [!NOTE]
-> Since Debian 12 console should be sent to ttyAMA1.
->
-> *earlycon=pl011,0x3f201000* is also needed to get boot logs.
+> Since Debian 12 console should be sent to `ttyAMA1`.
+> 
+> `earlycon=pl011,0x3f201000` is also needed to get boot logs.
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel deb12\kernel8.img -dtb deb12\bcm2710-rpi-3-b.dtb -drive file=deb12\2025-11-24-raspios-bookworm-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2025-11-24-raspios-bookworm-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
 ### Raspberry Pi OS 11
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel deb11\kernel8.img -dtb deb11\bcm2710-rpi-3-b.dtb -drive file=deb11\2025-05-06-raspios-bullseye-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "console=ttyAMA0,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2025-05-06-raspios-bullseye-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "console=ttyAMA0,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+```
+
+### AlmaLinux 10 *(slow, wait cloud-init to be complete)*
+
+> [!CAUTION]
+> Raspberry Pi 4 is needed, but network is not available by now! You will not gain any access, it will just boot and that is all...
+
+```Shell
+qemu-system-aarch64 -nographic -machine raspi4b -kernel kernel-6.12.47-20250916.v8.1.el10.img -initrd initramfs-6.12.47-20250916.v8.1.el10.img -dtb bcm2711-rpi-4-b.dtb -drive file=AlmaLinux-10-RaspberryPi-gpt-10.1-20251201.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=PARTUUID=530e947f-26ce-402e-8562-a8c34939f03d rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
 ### AlmaLinux 9 *(slow, wait cloud-init to be complete)*
@@ -76,11 +86,11 @@ qemu-system-aarch64 -nographic -machine raspi3b -kernel deb11\kernel8.img -dtb d
 > Since this version mounting initramfs is needed.
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel alma9\kernel-6.12.47-20250916.v8.1.el9.img -dtb alma9\bcm2710-rpi-3-b.dtb -drive file=alma9\AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0" -initrd alma9\initramfs-6.12.47-20250916.v8.1.el9.img
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.12.47-20250916.v8.1.el9.img -initrd initramfs-6.12.47-20250916.v8.1.el9.img -dtb bcm2710-rpi-3-b.dtb -drive file=AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
 ### AlmaLinux 8 *(terribly slow, wait cloud-init to be complete)*
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel alma8\kernel-6.6.74-20250127.v8.1.el8.img -dtb alma8\bcm2710-rpi-3-b.dtb -drive file=alma8\AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.6.74-20250127.v8.1.el8.img -dtb bcm2710-rpi-3-b.dtb -drive file=AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0
 ```
