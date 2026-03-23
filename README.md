@@ -50,7 +50,9 @@
 
 ## How to emulate a Raspberry Pi
 
-Simply use following commands (adapt paths to your needs), then connect to localhost via SSH on port 2222:
+Simply use following commands (adapt paths to your needs), then:
+- connect to localhost via SSH on port `2222`
+- or use [https://localhost:9091](https://localhost:9091) if you installed [Cockpit](https://cockpit-project.org/):
 
 > [!TIP]
 > You can exit QEMU console with Ctrl+A then X, it will end emulation.
@@ -63,12 +65,12 @@ Simply use following commands (adapt paths to your needs), then connect to local
 > `earlycon=pl011,0x3f201000` is also needed to get boot logs.
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2025-11-24-raspios-bookworm-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2025-11-24-raspios-bookworm-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
 ### Raspberry Pi OS 11
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2025-05-06-raspios-bullseye-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "console=ttyAMA0,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2025-05-06-raspios-bullseye-arm64-lite-passwd.img,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "console=ttyAMA0,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
 ### AlmaLinux 10 *(slow, wait cloud-init to be complete)*
@@ -77,7 +79,7 @@ qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710
 > Raspberry Pi 4 is needed, but network is not available by now! You will not gain any access, it will just boot and that is all...
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi4b -kernel kernel-6.12.47-20250916.v8.1.el10.img -initrd initramfs-6.12.47-20250916.v8.1.el10.img -dtb bcm2711-rpi-4-b.dtb -drive file=AlmaLinux-10-RaspberryPi-gpt-10.1-20251201.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=PARTUUID=530e947f-26ce-402e-8562-a8c34939f03d rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+qemu-system-aarch64 -nographic -machine raspi4b -kernel kernel-6.12.47-20250916.v8.1.el10.img -initrd initramfs-6.12.47-20250916.v8.1.el10.img -dtb bcm2711-rpi-4-b.dtb -drive file=AlmaLinux-10-RaspberryPi-gpt-10.1-20251201.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=PARTUUID=530e947f-26ce-402e-8562-a8c34939f03d rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
 ### AlmaLinux 9 *(slow, wait cloud-init to be complete)*
@@ -86,11 +88,11 @@ qemu-system-aarch64 -nographic -machine raspi4b -kernel kernel-6.12.47-20250916.
 > Since this version mounting initramfs is needed.
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.12.47-20250916.v8.1.el9.img -initrd initramfs-6.12.47-20250916.v8.1.el9.img -dtb bcm2710-rpi-3-b.dtb -drive file=AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.12.47-20250916.v8.1.el9.img -initrd initramfs-6.12.47-20250916.v8.1.el9.img -dtb bcm2710-rpi-3-b.dtb -drive file=AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0"
 ```
 
 ### AlmaLinux 8 *(terribly slow, wait cloud-init to be complete)*
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.6.74-20250127.v8.1.el8.img -dtb bcm2710-rpi-3-b.dtb -drive file=AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.6.74-20250127.v8.1.el8.img -dtb bcm2710-rpi-3-b.dtb -drive file=AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0
 ```
