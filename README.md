@@ -16,12 +16,18 @@
 >
 > Links do not point to *\*-**latest**.\** files, explore parent folder to check if any new version is available.
 
-- [Raspberry Pi OS 13 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64-lite.img.xz) (2.78 GB uncompressed)
-- [Raspberry Pi OS 12 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz) (2.56 GB uncompressed)
-- [Raspberry Pi OS 11 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-05-07/2025-05-06-raspios-bullseye-arm64-lite.img.xz) (1.96 GB uncompressed)
-- [AlmaLinux 10 - no GUI](https://repo.almalinux.org/almalinux/10/raspberrypi/images/AlmaLinux-10-RaspberryPi-gpt-10.1-20251201.aarch64.raw.xz) (2.83 GB uncompressed)
-- [AlmaLinux 9 - no GUI](https://repo.almalinux.org/almalinux/9/raspberrypi/images/AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw.xz) (2.83 GB uncompressed)
-- [AlmaLinux 8 - no GUI](https://repo.almalinux.org/almalinux/8/raspberrypi/images/AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw.xz) (3.41 GB uncompressed - *yes, you read right*)
+- Raspberry Pi OS
+  - [13 Lite](https://downloads.raspberrypi.com/raspios_lite_arm64/images/raspios_lite_arm64-2025-12-04/2025-12-04-raspios-trixie-arm64-lite.img.xz) - 2.78 GB uncompressed
+  - [12 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-11-24/2025-11-24-raspios-bookworm-arm64-lite.img.xz) - 2.56 GB uncompressed
+  - [11 Lite](https://downloads.raspberrypi.com/raspios_oldstable_lite_arm64/images/raspios_oldstable_lite_arm64-2025-05-07/2025-05-06-raspios-bullseye-arm64-lite.img.xz) - 1.96 GB uncompressed
+- AlmaLinux
+  - [10 w/o GUI](https://repo.almalinux.org/almalinux/10/raspberrypi/images/AlmaLinux-10-RaspberryPi-gpt-10.1-20251201.aarch64.raw.xz) - 2.83 GB uncompressed
+  - [9 w/o GUI](https://repo.almalinux.org/almalinux/9/raspberrypi/images/AlmaLinux-9-RaspberryPi-mbr-9.7-20251118.aarch64.raw.xz) - 2.83 GB uncompressed
+  - [8 w/o GUI](https://repo.almalinux.org/almalinux/8/raspberrypi/images/AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw.xz) - 3.41 GB uncompressed - *yes, you read right*
+- Rocky Linux
+  - [10](https://dl.rockylinux.org/pub/rocky/10/images/aarch64/Rocky-10-SBC-RaspberryPi-10.1-20251122.2.aarch64.raw.xz) - 3.08 GB uncompressed
+  - [9](https://dl.rockylinux.org/pub/sig/9/altarch/aarch64/images/RockyRpi_9.2.img.xz) - 3.52 GB uncompressed
+  - [8](https://dl.rockylinux.org/pub/sig/8/altarch/aarch64/images/RockyRpi_8.8.img.xz) - 3.52 GB uncompressed
 
 ### Preparing images
 
@@ -92,6 +98,9 @@ qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.12.47-20250916.
 ```
 
 ### AlmaLinux 8 *(terribly slow, wait cloud-init to be complete)*
+
+> [!NOTE]
+> Mounting initramfs is needed for Rocky Linux 8+.
 
 ```Shell
 qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel-6.6.74-20250127.v8.1.el8.img -dtb bcm2710-rpi-3-b.dtb -drive file=AlmaLinux-8-RaspberryPi-mbr-8.10-20250331.aarch64.raw,format=raw -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0
