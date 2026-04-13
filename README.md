@@ -63,6 +63,10 @@ Simply use following commands (adapt paths to your needs), then:
 > [!TIP]
 > You can exit QEMU console with Ctrl+A then X, it will end emulation.
 
+> [!NOTE]
+> If you would like to kind-of emulate Rasperry Pi Zero 2 W, just limit memory in kernel adding `mem=512M` in `-append` argument
+> Emulated CPU is identical: Cortex-A53 (4 cores), check [Raspberry Pi Zero 2 W product brief](https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-product-brief.pdf)
+
 ### Raspberry Pi OS 12
 
 > [!NOTE]
