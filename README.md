@@ -63,6 +63,9 @@ Simply use following commands (adapt paths to your needs), then:
 > [!TIP]
 > You can exit QEMU console with Ctrl+A then X, it will end emulation.
 
+> [!WARNING]
+> For cloud-init images, wait following message before logging in: `cloud-init[PID]: Cloud-init v. VERSION finished at DATE. Datasource DataSourceNoCloud [seed=BOOT_DEVICE].  Up *.* seconds`.
+
 > [!NOTE]
 > If you would like to kind-of emulate Rasperry Pi Zero 2 W, just limit memory in kernel adding `mem=512M` in `-append` argument. Use this only after preparing you OS to reduce time wasting, emulation and swap are slow!
 > 
