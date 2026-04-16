@@ -76,10 +76,10 @@ Simply use following commands (adapt paths to your needs), then:
 ### Raspberry Pi OS 13 *(INSANELY slow, wait cloud-init to be complete)*
 
 > [!NOTE]
-> Since this version it seems systemd has an issue with watchdog device, 'disable' it with `systemd.watchdog-device=/dev/null`.
+> Since this version it seems systemd has an issue with watchdog device, 'disable' it with `systemd.watchdog-device=/dev/watchdog9 systemd.watchdog_sec=off`.
 
 ```Shell
-qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2026-04-13-raspios-trixie-arm64-lite.img,format=raw,cache=writeback,aio=threads -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0 ipv6.disable=1 systemd.watchdog-device=/dev/null"
+qemu-system-aarch64 -nographic -machine raspi3b -kernel kernel8.img -dtb bcm2710-rpi-3-b.dtb -drive file=2026-04-13-raspios-trixie-arm64-lite.img,format=raw,cache=writeback,aio=threads -netdev user,id=net0,hostfwd=tcp::2222-:22,hostfwd=tcp::9091-:9090 -device usb-net,netdev=net0 -append "earlycon=pl011,0x3f201000 console=ttyAMA1,115200 root=/dev/mmcblk0p2 rw rootwait dwc_otg.lpm_enable=0 dwc_otg.fiq_fsm_enable=0 ipv6.disable=1 systemd.watchdog-device=/dev/watchdog9 systemd.watchdog_sec=off"
 ```
 
 ### Raspberry Pi OS 12
